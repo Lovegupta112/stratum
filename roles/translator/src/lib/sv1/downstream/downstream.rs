@@ -340,6 +340,24 @@ impl Downstream {
     /// which implements the SV1 protocol logic and generates appropriate responses.
     /// Responses are sent back to the miner, while share submissions are forwarded
     /// to the SV1 server for upstream processing.
+    
+    /// ! DEBUG: --------- 
+    // pub async fn handle_downstream_message(self: Arc<Self>) -> Result<(), TproxyError> {
+    //     let message = match self
+    //         .downstream_channel_state
+    //         .downstream_sv1_receiver
+    //         .recv()
+    //         .await
+    //     {
+    //         Ok(msg) => msg,
+    //         Err(e) => {
+    //             error!("Error receiving downstream message: {:?}", e);
+    //             return Err(TproxyError::ChannelErrorReceiver(e));
+    //         }
+    //     };
+
+    //** changed code -------------
+
     pub async fn handle_downstream_message(self: Arc<Self>) -> Result<(), TproxyError> {
         let message = match self
             .downstream_channel_state
@@ -412,6 +430,22 @@ impl Downstream {
                 // Check if this was an authorize message and handle sv1 handshake completion
                 if let v1::json_rpc::Message::StandardRequest(request) = &message {
                     if request.method == "mining.authorize" {
+                        if let Some(params) = request.params.as_array() { 
+            // Extract username (index 0) and password (index 1)
+                        let username = params.get(0).and_then(|v| v.as_str()).unwrap_or("N/A");
+                        let password = params.get(1).and_then(|v| v.as_str()).unwrap_or("N/A");
+
+                    //    let password_opt = params.get(1).and_then(|v| v.as_str()).map(|s| s.to_string());
+                    //     self.downstream_data.super_safe_lock(|d| {
+                    //         d.authorized_worker_name = username.to_string();
+                    //         d.worker_password = password_opt;
+                    //     });
+
+                        // *** IMPORTANT: THIS WILL LOG SENSITIVE DATA ***
+                        info!("447.... DOWNSTREAM_AUTH: Worker '{}' authenticated with password '{}'", username, password);
+            // --------------------------------
+                        }
+                        info!("Down: Handling mining.authorize after handshake completion");
                         if let Err(e) = self.handle_sv1_handshake_completion().await {
                             error!("Down: Failed to handle handshake completion: {:?}", e);
                             return Err(e);
@@ -445,6 +479,99 @@ impl Downstream {
 
         Ok(())
     }
+    //       println!("357...{:?}",self);
+
+    //     // Check if channel is established
+    //     let channel_established = self
+    //         .downstream_data
+    //         .super_safe_lock(|d| d.channel_id.is_some());
+
+    //     if !channel_established {
+    //         // Check if this is the first message (queue is empty) and send OpenChannel request
+    //         let is_first_message = self
+    //             .downstream_data
+    //             .super_safe_lock(|d| d.queued_sv1_handshake_messages.is_empty());
+
+    //         if is_first_message {
+    //             let downstream_id = self.downstream_data.super_safe_lock(|d| d.downstream_id);
+    //             self.downstream_channel_state
+    //                 .sv1_server_sender
+    //                 .send(DownstreamMessages::OpenChannel(downstream_id))
+    //                 .await
+    //                 .map_err(|e| {
+    //                     error!("Down: Failed to send OpenChannel request: {:?}", e);
+    //                     TproxyError::ChannelErrorSender
+    //                 })?;
+    //             debug!(
+    //                 "Down: Sent OpenChannel request for downstream {}",
+    //                 downstream_id
+    //             );
+    //         }
+
+    //         // Queue all messages until channel is established
+    //         debug!("Down: Queuing Sv1 message until channel is established");
+    //         self.downstream_data.safe_lock(|d| {
+    //             d.queued_sv1_handshake_messages.push(message.clone());
+    //         })?;
+    //         return Ok(());
+    //     }
+
+    //     // Channel is established, process message normally
+    //     let response = self
+    //         .downstream_data
+    //         .super_safe_lock(|data| data.handle_message(message.clone()));
+
+    //     match response {
+    //         Ok(Some(response_msg)) => {
+    //             debug!(
+    //                 "Down: Sending Sv1 message to downstream: {:?}",
+    //                 response_msg
+    //             );
+    //             self.downstream_channel_state
+    //                 .downstream_sv1_sender
+    //                 .send(response_msg.into())
+    //                 .await
+    //                 .map_err(|e| {
+    //                     error!("Down: Failed to send message to downstream: {:?}", e);
+    //                     TproxyError::ChannelErrorSender
+    //                 })?;
+
+    //             // Check if this was an authorize message and handle sv1 handshake completion
+    //             if let v1::json_rpc::Message::StandardRequest(request) = &message {
+    //                 if request.method == "mining.authorize" {
+    //                     if let Err(e) = self.handle_sv1_handshake_completion().await {
+    //                         error!("Down: Failed to handle handshake completion: {:?}", e);
+    //                         return Err(e);
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         Ok(None) => {
+    //             // Message was handled but no response needed
+    //         }
+    //         Err(e) => {
+    //             error!("Down: Error handling downstream message: {:?}", e);
+    //             return Err(e.into());
+    //         }
+    //     }
+
+    //     // Check if there's a pending share to send to the Sv1Server
+    //     let pending_share = self
+    //         .downstream_data
+    //         .super_safe_lock(|d| d.pending_share.take());
+    //     if let Some(share) = pending_share {
+    //         self.downstream_channel_state
+    //             .sv1_server_sender
+    //             .send(DownstreamMessages::SubmitShares(share))
+    //             .await
+    //             .map_err(|e| {
+    //                 error!("Down: Failed to send share to SV1 server: {:?}", e);
+    //                 TproxyError::ChannelErrorSender
+    //             })?;
+    //     }
+
+    //     Ok(())
+    // }
 
     /// Handles SV1 handshake completion after mining.authorize.
     ///
