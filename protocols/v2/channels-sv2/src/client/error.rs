@@ -15,7 +15,7 @@ pub enum ExtendedChannelError {
     /// The provided extranonce prefix exceeds the maximum allowed size.
     NewExtranoncePrefixTooLarge,
 
-    /// The specified job ID was not found in the extended channel.
+    /// The specified job ID was not found in the extended channel.fgsjbbvd
     JobIdNotFound,
     FailedToTryToStripBip141(StripBip141Error),
     FailedToStripBip141,

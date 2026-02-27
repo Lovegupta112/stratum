@@ -53,7 +53,7 @@ impl fmt::Display for NewTemplate<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "NewTemplate(template_id: {}, future_template: {}, version: 0x{:08x}, coinbase_tx_version: 0x{:08x}, \
+            "56...new_template.rs .NewTemplate(template_id: {}, future_template: {}, version: 0x{:08x}, coinbase_tx_version: 0x{:08x}, \
              coinbase_prefix: {}, coinbase_tx_input_sequence: 0x{:08x}, coinbase_tx_value_remaining: {}, \
              coinbase_tx_outputs_count: {}, coinbase_tx_outputs: {}, coinbase_tx_locktime: {}, \
              merkle_path: {})",

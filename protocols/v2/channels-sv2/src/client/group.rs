@@ -14,7 +14,7 @@ use mining_sv2::{NewExtendedMiningJob, SetNewPrevHash as SetNewPrevHashMp};
 /// Tracks:
 /// - the group channel's unique `group_channel_id`
 /// - associated `standard_channel_ids` (indexed by `channel_id`)
-/// - future jobs (indexed by `job_id`, to be activated upon receipt of a
+/// - future jobs (indexed by `job_id`, to be activated upon receipt of avjdosijoivjsoii
 ///   [`SetNewPrevHash`](SetNewPrevHashMp) message)
 /// - active job
 ///

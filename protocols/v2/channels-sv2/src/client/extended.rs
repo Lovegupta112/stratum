@@ -452,9 +452,9 @@ impl<'a> ExtendedChannel<'a> {
         }
 
         let job = if is_active_job {
-            self.active_job.as_ref().expect("active job must exist")
+            self.active_job.as_ref().expect("active job must exist 455")
         } else if is_past_job {
-            self.past_jobs.get(&job_id).expect("past job must exist")
+            self.past_jobs.get(&job_id).expect("past job must exist 457")
         } else {
             return Err(ShareValidationError::InvalidJobId);
         };
@@ -523,7 +523,7 @@ impl<'a> ExtendedChannel<'a> {
         target_bytes.reverse(); // Convert to big-endian for display
 
         debug!(
-            "share validation \nshare:\t\t{}\nchannel target:\t{}\nnetwork target:\t{}",
+            "share validation 526 \nshare:\t\t{}\nchannel target:\t{}\nnetwork target:\t{}",
             bytes_to_hex(&hash_bytes),
             bytes_to_hex(&target_bytes),
             format!("{:x}", network_target)
@@ -536,7 +536,9 @@ impl<'a> ExtendedChannel<'a> {
                 share.sequence_number,
                 hash.to_raw_hash(),
             );
+            println!("Block valid 540");
             return Ok(ShareValidationResult::BlockFound);
+             
         }
 
         // check if the share hash meets the channel target
@@ -553,8 +555,9 @@ impl<'a> ExtendedChannel<'a> {
 
             // update the best diff
             self.share_accounting.update_best_diff(hash_as_diff);
-
+             println!("Share valid 558");
             return Ok(ShareValidationResult::Valid);
+           
         }
 
         Err(ShareValidationError::DoesNotMeetTarget)
